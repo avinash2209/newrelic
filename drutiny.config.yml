@@ -1,0 +1,10 @@
+CredentialSchema:
+  newrelic:
+    account_id:
+      type: string
+      description: Your account id to connect to the NewRelic API with
+    api_key:
+      type: string
+      description: Your api key to connect to the NewRelic API with
+Cache:
+  newrelic: Symfony\Component\Cache\Adapter\FilesystemAdapter
