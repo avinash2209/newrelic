@@ -76,8 +76,6 @@ class SlowTransactions extends AbstractAnalysis {
     $options = [
       'query' => [
         'name' => 'WebTransaction/Action/Drupal',
-        //'values[]' => 'score',
-        //'summarize' => TRUE
       ],
       'headers' => [
         'x-api-key' => $this->api_key
@@ -85,8 +83,8 @@ class SlowTransactions extends AbstractAnalysis {
     ];
 
     // Set start and end date for the metric data.
-    //$options['query']['from'] = $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339);
-    //$options['query']['to'] = $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339);
+    $options['query']['from'] = $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339);
+    $options['query']['to'] = $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339);
 
     $client = new \GuzzleHttp\Client();
     $response = $client->request('GET', $uri, $options);
@@ -100,27 +98,27 @@ class SlowTransactions extends AbstractAnalysis {
     $transactions = [];
     $i = 0;
     foreach ($metricNames['metrics'] as $item) {
-      $trans = 'names[]=' . $item['name'];
       $uri = $this->getNewRelicDataUrl();
       $options = [
-        /*'query' => [
-          'names[]' => $trans,
-          'summarize' => TRUE
-        ],*/
         'headers' => [
           'x-api-key' => $this->api_key
         ],
       ];
 
       // Set start and end date for the metric data.
-      //$options['query']['from'] = $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339);
-      //$options['query']['to'] = $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339);
-
-      $uri .= '?summarize=true&' . $trans;
+      $params = [
+        'names[]' => $item['name'],
+        'summarize' => TRUE,
+        'from' => $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339),
+        'to' => $sandbox->getReportingPeriodEnd()->format(\DateTime::RFC3339),
+      ];
+      $query = http_build_query($params);
+      $uri .= '?summarize=true&' . $query;
       $client = new \GuzzleHttp\Client();
       $request = $client->request('GET', $uri, $options);
       $data = json_decode($request->getBody()->getContents(), true);
-      
+      print_r($data);
+      // Collect metric data from the response and add metric name.
       if (!empty($data['metric_data']['metrics'][0]['timeslices'][0]['values']['average_response_time'])) {
         $transactions[$i] = $data['metric_data']['metrics'][0]['timeslices'][0]['values'];
         $transactions[$i]['name'] = $item['name'];
