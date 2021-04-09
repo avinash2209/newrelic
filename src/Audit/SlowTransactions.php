@@ -117,7 +117,7 @@ class SlowTransactions extends AbstractAnalysis {
       $client = new \GuzzleHttp\Client();
       $request = $client->request('GET', $uri, $options);
       $data = json_decode($request->getBody()->getContents(), true);
-      print_r($data);
+
       // Collect metric data from the response and add metric name.
       if (!empty($data['metric_data']['metrics'][0]['timeslices'][0]['values']['average_response_time'])) {
         $transactions[$i] = $data['metric_data']['metrics'][0]['timeslices'][0]['values'];
