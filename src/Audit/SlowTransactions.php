@@ -94,10 +94,17 @@ class SlowTransactions extends AbstractAnalysis {
 
   public function getNewRelicTransactions(Sandbox $sandbox) {
     $metricNames = $this->getNewRelicMetricNames($sandbox);
-
     $transactions = [];
+    $metrics = [];
     $i = 0;
     foreach ($metricNames['metrics'] as $item) {
+      $metrics[] = $item['name'];
+    }
+
+    foreach (array_chunk($metrics, 35) as $metric_chunks) {
+      foreach ($metric_chunks as $names) {
+        $names = implode('&names[]=', $metric_chunks);
+      }
       $uri = $this->getNewRelicDataUrl();
       $options = [
         'headers' => [
@@ -107,29 +114,26 @@ class SlowTransactions extends AbstractAnalysis {
 
       // Set start and end date for the metric data.
       $params = [
-        'names[]' => $item['name'],
         'summarize' => TRUE,
         'from' => $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339),
         'to' => $sandbox->getReportingPeriodEnd()->format(\DateTime::RFC3339),
       ];
       $query = http_build_query($params);
-      $uri .= '?summarize=true&' . $query;
+      $uri .= '?' . $names . '&' . $query;
       $client = new \GuzzleHttp\Client();
       $request = $client->request('GET', $uri, $options);
       $data = json_decode($request->getBody()->getContents(), true);
-
+      $sandbox->logger()->info($i . ' transactions processed');
       // Collect metric data from the response and add metric name.
-      if (!empty($data['metric_data']['metrics'][0]['timeslices'][0]['values']['average_response_time'])) {
-        $transactions[$i] = $data['metric_data']['metrics'][0]['timeslices'][0]['values'];
-        $transactions[$i]['name'] = $item['name'];
-        $lastvalue = end($transactions[$i]);
-        $lastkey = key($transactions[$i]);
-        $transactions_sort[$i] = array($lastkey=>$lastvalue);
-        $transactions[$i] = array_merge($transactions_sort[$i],$transactions[$i]);
+      foreach ($data['metric_data']['metrics'] as $data) {
+        if (!empty($data['timeslices'][0]['values']['average_response_time'])) {
+          $transactions[$i] = $data['timeslices'][0]['values'];
+          $transactions[$i]['name'] = $data['name'];
+        }
+        $i++;
       }
-
-      $i++;
     }
+
 
     return $transactions;
   }
