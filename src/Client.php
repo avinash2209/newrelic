@@ -18,7 +18,7 @@ class Client {
   /**
    * Email used for API authentication.
    */
-  protected $account_id;
+  protected $app_id;
 
   /**
    * API key used for authentication.
@@ -28,8 +28,8 @@ class Client {
   /**
    * API constructor.
    */
-  public function __construct($account_id, $api_key) {
-    $this->account_id = $account_id;
+  public function __construct($app_id, $api_key) {
+    $this->app_id = $app_id;
     $this->api_key = $api_key;
   }
 
@@ -54,7 +54,7 @@ class Client {
     $time = 0;
 
     $client = new HttpClient([
-      'base_uri' => 'https://api.newrelic.com/v2/applications/'. $this->account_id . '/',
+      'base_uri' => 'https://api.newrelic.com/v2/applications/'. $this->app_id . '/',
       'headers' => [
         'x-api-key' => $this->api_key,
       ],

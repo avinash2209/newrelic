@@ -1,8 +1,8 @@
 CredentialSchema:
   newrelic:
-    account_id:
+    app_id:
       type: string
-      description: Your account id to connect to the NewRelic API with
+      description: Your app id to connect to the NewRelic API with
     api_key:
       type: string
       description: Your api key to connect to the NewRelic API with
