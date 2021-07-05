@@ -43,7 +43,7 @@ class ApdexScoreAudit extends AbstractAnalysis {
   protected function api()
   {
     $creds = Manager::load('newrelic');
-    return new Client($creds['account_id'], $creds['api_key']);
+    return new Client($creds['app_id'], $creds['api_key']);
   }
 
   /**

@@ -33,7 +33,7 @@ class SlowTransactions extends AbstractAnalysis {
   /**
    * Email used for API authentication.
    */
-  protected $account_id;
+  protected $app_id;
 
   /**
    * API key used for authentication.
@@ -48,7 +48,7 @@ class SlowTransactions extends AbstractAnalysis {
   protected function api()
   {
     $creds = Manager::load('newrelic');
-    return new Client($creds['account_id'], $creds['api_key']);
+    return new Client($creds['app_id'], $creds['api_key']);
   }
 
   /**
@@ -140,15 +140,15 @@ class SlowTransactions extends AbstractAnalysis {
   }
 
   public function getNewRelicDataUrl() {
-    return self::API_BASE . $this->account_id . '/metrics/data.json';
+    return self::API_BASE . $this->app_id . '/metrics/data.json';
   }
 
   public function getNewRelicMetricUrl() {
-    return self::API_BASE . $this->account_id . '/metrics.json';
+    return self::API_BASE . $this->app_id . '/metrics.json';
   }
 
   public function setApiCreds($creds) {
-    $this->account_id = $creds['account_id'];
+    $this->app_id = $creds['app_id'];
     $this->api_key = $creds['api_key'];
   }
 }
