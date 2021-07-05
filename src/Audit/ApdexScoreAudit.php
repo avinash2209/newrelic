@@ -58,8 +58,8 @@ class ApdexScoreAudit extends AbstractAnalysis {
     $options = [
       'names[]' => 'Apdex',
       'summarize' => TRUE,
-      'from' => $sandbox->getReportingPeriodStart()->format(\DateTime::RFC3339),
-      'to' => $sandbox->getReportingPeriodEnd()->format(\DateTime::RFC3339),
+      'from' => $sandbox->getReportingPeriodStart()->format(\DateTimeInterface::RFC3339),
+      'to' => $sandbox->getReportingPeriodEnd()->format(\DateTimeInterface::RFC3339),
     ];
 
     $query = http_build_query($options);
