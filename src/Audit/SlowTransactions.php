@@ -68,7 +68,6 @@ class SlowTransactions extends AbstractAnalysis {
     });
     $result['transaction'] = array_slice($transactions, 0, 9);
     $sandbox->setParameter('results', $result['transaction']);
-    return TRUE;
   }
 
   public function getNewRelicMetricNames(Sandbox $sandbox) {

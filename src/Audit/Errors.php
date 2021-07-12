@@ -63,12 +63,15 @@ class Errors extends AbstractAnalysis {
     $sandbox->setParameter('host', $host);
 
     $transactions = $this->getNewRelicTransactions($sandbox);
-    usort($transactions, function($a, $b) {
-      return $b['error_count'] <=> $a['error_count'];
-    });
-    $result['transaction'] = array_slice($transactions, 0, 9);
+    if (!empty($transactions)) {
+      usort($transactions, function($a, $b) {
+        return $b['error_count'] <=> $a['error_count'];
+      });
+      $transactions = array_slice($transactions, 0, 9);
+    }
+
+    $result['transaction'] = $transactions;
     $sandbox->setParameter('results', $result['transaction']);
-    return TRUE;
   }
 
   public function getNewRelicMetricNames(Sandbox $sandbox) {
@@ -126,7 +129,7 @@ class Errors extends AbstractAnalysis {
       $sandbox->logger()->info($i . ' transactions processed');
       // Collect metric data from the response and add metric name.
       foreach ($data['metric_data']['metrics'] as $data) {
-        if (isset($data['timeslices'][0]['values']['error_count'])) {
+        if (!empty($data['timeslices'][0]['values']['error_count'])) {
           $transactions[$i] = $data['timeslices'][0]['values'];
           $transactions[$i]['name'] = $data['name'];
           $i++;
