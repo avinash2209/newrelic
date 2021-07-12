@@ -63,11 +63,15 @@ class SlowTransactions extends AbstractAnalysis {
     $sandbox->setParameter('host', $host);
 
     $transactions = $this->getNewRelicTransactions($sandbox);
-    usort($transactions, function($a, $b) {
-      return $b['average_response_time'] <=> $a['average_response_time'];
-    });
-    $result['transaction'] = array_slice($transactions, 0, 9);
-    $sandbox->setParameter('results', $result['transaction']);
+    if (!empty($transactions)) {
+      usort($transactions, function($a, $b) {
+        return $b['average_response_time'] <=> $a['average_response_time'];
+      });
+      $transactions = array_slice($transactions, 0, 9);
+    }
+
+    $sandbox->setParameter('results', $transactions);
+    $sandbox->setParameter('count', count($transactions));
   }
 
   public function getNewRelicMetricNames(Sandbox $sandbox) {

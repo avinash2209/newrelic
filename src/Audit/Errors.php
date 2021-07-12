@@ -70,8 +70,8 @@ class Errors extends AbstractAnalysis {
       $transactions = array_slice($transactions, 0, 9);
     }
 
-    $result['transaction'] = $transactions;
-    $sandbox->setParameter('results', $result['transaction']);
+    $sandbox->setParameter('results', $transactions);
+    $sandbox->setParameter('count', count($transactions));
   }
 
   public function getNewRelicMetricNames(Sandbox $sandbox) {
